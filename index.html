@@ -1,0 +1,609 @@
+<title>Lettre pour Nissou · رسالة إلى نيسو</title>
+<style>
+  :root{
+    --ink:#1b1220;
+    --plum:#2a1a2e;
+    --plum-deep:#1f1424;
+    --gold:#c9a15a;
+    --gold-soft:rgba(201,161,90,.35);
+    --rose:#d68fa0;
+    --ivory:#f3e9e4;
+    --garnet:#7a2331;
+
+    --font-script:'Snell Roundhand','Segoe Script','Lucida Handwriting','Bradley Hand',cursive;
+    --font-serif-fr:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --font-serif-ar:'Diwan Kufi','DecoType Naskh','Al Nile',Damascus,'Geeza Pro','Traditional Arabic',serif;
+    --font-body-ar:Damascus,'Geeza Pro',Dubai,'Segoe UI','Noto Naskh Arabic',Tahoma,sans-serif;
+    --font-label:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--ink);}
+  body{
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(214,143,160,.10), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 20% 100%, rgba(201,161,90,.08), transparent 60%),
+      var(--ink);
+    color:var(--ivory);
+    font-family:var(--font-serif-fr);
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  body.locked{overflow:hidden;height:100vh;}
+
+  h1,h2,h3{text-wrap:balance;font-weight:400;}
+  ::selection{background:var(--rose);color:var(--ink);}
+  a{color:inherit;}
+
+  button{font-family:inherit;cursor:pointer;}
+  button:focus-visible,
+  .envelope-trigger:focus-visible{
+    outline:2px solid var(--rose);
+    outline-offset:4px;
+  }
+
+  /* ---------- language switching ---------- */
+  .ar{display:none;}
+  body.lang-ar .fr{display:none;}
+  body.lang-ar .ar{display:inline;}
+  body.lang-ar .ar-block{display:block;}
+  .ar,.ar-block{
+    font-family:var(--font-body-ar);
+    direction:rtl;
+    unicode-bidi:isolate;
+  }
+  .ar-block{text-align:right;}
+  .num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;display:inline-block;}
+
+  /* ---------- language toggle ---------- */
+  .lang-toggle{
+    position:fixed;
+    top:1.25rem;
+    right:1.25rem;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+    background:rgba(42,26,46,.7);
+    border:1px solid var(--gold-soft);
+    border-radius:999px;
+    padding:.4rem .5rem;
+    backdrop-filter:blur(6px);
+    font-family:var(--font-label);
+    font-size:.72rem;
+    letter-spacing:.08em;
+  }
+  .lang-toggle span{padding:.25rem .6rem;border-radius:999px;color:rgba(243,233,228,.55);transition:color .3s ease,background .3s ease;}
+  .lang-toggle span.active{color:var(--ink);background:var(--gold);}
+
+  /* ---------- particle canvas ---------- */
+  #particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;}
+
+  /* ================= ENVELOPE OVERLAY ================= */
+  #envelope-overlay{
+    position:fixed;inset:0;z-index:50;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.75rem;
+    background:radial-gradient(ellipse 80% 60% at 50% 40%, #241732, var(--ink));
+    transition:opacity .7s ease .1s, visibility .7s ease .1s;
+  }
+  #envelope-overlay.opened{opacity:0;visibility:hidden;pointer-events:none;}
+
+  .envelope-trigger{
+    background:none;border:none;padding:0;
+    perspective:900px;
+  }
+  .envelope-body{
+    position:relative;
+    width:250px;height:165px;
+    background:linear-gradient(160deg,var(--plum),var(--plum-deep));
+    border:1px solid var(--gold-soft);
+    border-radius:3px;
+    box-shadow:0 25px 70px rgba(0,0,0,.55), inset 0 0 40px rgba(0,0,0,.25);
+  }
+  .envelope-body::before,
+  .envelope-body::after{
+    content:"";position:absolute;bottom:0;width:0;height:0;
+    border-bottom:78px solid rgba(0,0,0,.18);
+  }
+  .envelope-body::before{left:0;border-left:125px solid transparent;}
+  .envelope-body::after{right:0;border-right:125px solid transparent;}
+
+  .envelope-flap{
+    position:absolute;top:0;left:0;width:0;height:0;
+    border-left:125px solid transparent;
+    border-right:125px solid transparent;
+    border-top:92px solid #2f1c32;
+    transform-origin:50% 0%;
+    transition:transform .85s cubic-bezier(.65,0,.35,1);
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+  }
+  .envelope-seal{
+    position:absolute;top:52px;left:50%;
+    width:52px;height:52px;
+    transform:translate(-50%,0);
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #96303f, var(--garnet) 70%);
+    box-shadow:0 4px 10px rgba(0,0,0,.45), inset 0 0 6px rgba(0,0,0,.4);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-serif-fr);
+    font-size:.85rem;letter-spacing:.03em;
+    color:var(--gold);
+    z-index:2;
+    transition:opacity .4s ease, transform .5s ease;
+  }
+
+  #envelope-overlay.opening .envelope-flap{transform:rotateX(180deg);}
+  #envelope-overlay.opening .envelope-seal{opacity:0;transform:translate(-50%,0) scale(.4);}
+
+  .envelope-hint{
+    font-family:var(--font-label);
+    font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;
+    color:rgba(243,233,228,.55);
+    display:flex;flex-direction:column;align-items:center;gap:.15rem;
+  }
+  .envelope-hint .ar{font-family:var(--font-body-ar);letter-spacing:0;text-transform:none;font-size:.95rem;}
+
+  /* ================= STAGE ================= */
+  #stage{
+    position:relative;z-index:1;
+    opacity:0;transform:translateY(8px);
+    transition:opacity 1s ease, transform 1s ease;
+  }
+  #stage.revealed{opacity:1;transform:translateY(0);}
+
+  section{
+    position:relative;
+    padding:7rem 1.5rem;
+    max-width:640px;
+    margin:0 auto;
+    display:flex;flex-direction:column;align-items:center;
+    text-align:center;
+  }
+
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .9s ease, transform .9s ease;}
+  .reveal.in-view{opacity:1;transform:translateY(0);}
+
+  .eyebrow{
+    font-family:var(--font-label);
+    font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--rose);margin-bottom:1.25rem;
+  }
+  .eyebrow .ar{letter-spacing:0;text-transform:none;font-size:.95rem;}
+
+  /* ---- hero ---- */
+  .hero{min-height:100svh;justify-content:center;padding-top:0;padding-bottom:0;}
+  .hero-name{
+    font-family:var(--font-script);
+    font-size:clamp(3.5rem,14vw,7rem);
+    color:var(--ivory);
+    line-height:1;
+    text-shadow:0 0 40px rgba(214,143,160,.35);
+  }
+  body.lang-ar .hero-name{font-family:var(--font-serif-ar);}
+  .hero-sub{
+    margin-top:1.5rem;
+    font-size:1.05rem;
+    color:rgba(243,233,228,.7);
+    font-style:italic;
+  }
+  body.lang-ar .hero-sub{font-style:normal;}
+  .scroll-cue{
+    position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+    width:1px;height:46px;
+    background:linear-gradient(var(--gold),transparent);
+    overflow:hidden;
+  }
+  .scroll-cue::after{
+    content:"";position:absolute;top:-46px;left:0;width:100%;height:100%;
+    background:linear-gradient(var(--gold),transparent);
+    animation:cue-drop 2.4s ease-in-out infinite;
+  }
+  @keyframes cue-drop{0%{transform:translateY(0);}100%{transform:translateY(92px);}}
+
+  /* ---- divider ---- */
+  .divider{
+    display:flex;align-items:center;gap:.9rem;
+    color:var(--gold);
+    margin:0 0 3rem;
+    width:100%;max-width:220px;
+  }
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-soft));}
+  .divider::after{background:linear-gradient(90deg,var(--gold-soft),transparent);}
+  .divider .mark{font-size:.7rem;}
+
+  /* ---- letter ---- */
+  .letter-card{
+    background:linear-gradient(165deg,rgba(42,26,46,.65),rgba(31,20,36,.75));
+    border:1px solid var(--gold-soft);
+    border-radius:6px;
+    padding:3rem 2.25rem;
+    box-shadow:0 30px 60px rgba(0,0,0,.35);
+  }
+  .letter-card p{
+    font-size:1.08rem;
+    line-height:1.85;
+    color:rgba(243,233,228,.92);
+    text-align:left;
+    margin-bottom:1.4rem;
+  }
+  body.lang-ar .letter-card p{text-align:right;line-height:2.1;font-size:1.15rem;}
+  .letter-card p:last-child{margin-bottom:0;}
+  .letter-card .signoff-inline{color:var(--rose);}
+
+  /* ---- special invitation reveal button ---- */
+  .cta-wrap{padding-top:.5rem;}
+  .special-btn{
+    display:inline-flex;align-items:center;gap:.9rem;
+    background:linear-gradient(160deg,rgba(201,161,90,.14),rgba(201,161,90,.05));
+    border:1px solid var(--gold-soft);
+    border-radius:999px;
+    padding:.85rem 1.6rem .85rem 1.2rem;
+    color:var(--ivory);
+    transition:transform .35s ease, border-color .35s ease, background .35s ease;
+  }
+  .special-btn:hover{transform:translateY(-2px);border-color:var(--gold);background:linear-gradient(160deg,rgba(201,161,90,.22),rgba(201,161,90,.08));}
+  .special-btn-seal{
+    width:30px;height:30px;border-radius:50%;flex-shrink:0;
+    background:radial-gradient(circle at 35% 30%,#96303f,var(--garnet) 70%);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold);font-size:.85rem;
+    box-shadow:0 3px 8px rgba(0,0,0,.4);
+    animation:pulse 2.6s ease-in-out infinite;
+  }
+  .special-btn-text{font-family:var(--font-serif-fr);font-size:1rem;letter-spacing:.02em;}
+  body.lang-ar .special-btn-text .ar{font-family:var(--font-body-ar);font-size:1.05rem;}
+  .special-btn-text span{display:block;}
+  .special-btn-text .fr + .ar{margin-top:0;}
+
+  /* ---- special section (hidden until revealed) ---- */
+  .special-section{display:none;opacity:0;transform:translateY(24px);transition:opacity 1s ease, transform 1s ease;}
+  .special-section.visible{opacity:1;transform:translateY(0);}
+
+  /* ---- invitation card ---- */
+  .invite-card{
+    width:100%;
+    border:1px solid var(--gold-soft);
+    border-radius:6px;
+    padding:2.75rem 2rem;
+    background:
+      linear-gradient(rgba(201,161,90,.05),rgba(201,161,90,.05)) padding-box;
+    position:relative;
+  }
+  .invite-card::before{
+    content:"";position:absolute;inset:8px;
+    border:1px solid rgba(201,161,90,.25);
+    border-radius:4px;
+    pointer-events:none;
+  }
+  .invite-title{font-size:1.4rem;letter-spacing:.04em;color:var(--ivory);margin-bottom:.5rem;}
+  body.lang-ar .invite-title{font-family:var(--font-serif-ar);font-size:1.6rem;}
+  .invite-role{
+    font-family:var(--font-label);
+    font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--rose);margin-bottom:2rem;
+  }
+  .invite-role .ar{letter-spacing:0;text-transform:none;font-family:var(--font-body-ar);font-size:1rem;}
+  .invite-date{
+    font-size:clamp(2.4rem,8vw,3.4rem);
+    color:var(--gold);
+    letter-spacing:.05em;
+    margin-bottom:1.75rem;
+  }
+  .invite-line{
+    font-size:1rem;color:rgba(243,233,228,.85);font-style:italic;margin-bottom:2.25rem;
+  }
+  body.lang-ar .invite-line{font-style:normal;}
+
+  .countdown{
+    display:flex;gap:1.75rem;justify-content:center;margin-bottom:.5rem;flex-wrap:wrap;
+  }
+  .countdown .unit{display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+  .countdown .figure{
+    font-family:var(--font-label);
+    font-size:1.9rem;color:var(--ivory);
+    font-variant-numeric:tabular-nums;
+  }
+  .countdown .caption{
+    font-family:var(--font-label);
+    font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(243,233,228,.5);
+  }
+  .countdown .caption .ar{font-family:var(--font-body-ar);letter-spacing:0;text-transform:none;font-size:.8rem;}
+
+  /* ---- closing ---- */
+  .closing-line{
+    font-size:1.15rem;line-height:1.8;color:rgba(243,233,228,.92);
+    margin-bottom:3rem;max-width:30ch;
+  }
+  body.lang-ar .closing-line{font-family:var(--font-body-ar);font-size:1.25rem;line-height:2.1;max-width:100%;}
+
+  .heart{
+    width:34px;height:30px;position:relative;margin-bottom:1.25rem;
+    animation:pulse 2.6s ease-in-out infinite;
+  }
+  .heart::before,.heart::after{
+    content:"";position:absolute;top:0;width:18px;height:28px;
+    background:var(--garnet);border-radius:18px 18px 0 0;
+  }
+  .heart::before{left:17px;transform:rotate(-45deg);transform-origin:0 100%;}
+  .heart::after{left:-1px;transform:rotate(45deg);transform-origin:100% 100%;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+
+  .signature{
+    font-family:var(--font-script);
+    font-size:2.2rem;color:var(--gold);
+  }
+  body.lang-ar .signature{font-family:var(--font-serif-ar);font-size:1.9rem;}
+  .signature-role{
+    font-family:var(--font-label);
+    font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+    color:rgba(243,233,228,.4);margin-top:.6rem;
+  }
+
+  footer{
+    text-align:center;padding:3rem 1.5rem 4rem;
+    font-family:var(--font-label);
+    font-size:.68rem;letter-spacing:.1em;
+    color:rgba(243,233,228,.3);
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
+    .scroll-cue::after{display:none;}
+  }
+
+  @media (max-width:480px){
+    section{padding:5rem 1.25rem;}
+    .letter-card{padding:2.25rem 1.5rem;}
+  }
+</style>
+
+<canvas id="particles" aria-hidden="true"></canvas>
+
+<div class="lang-toggle" role="group" aria-label="Langue / اللغة">
+  <span id="lang-fr-btn" class="active">FR</span>
+  <span id="lang-ar-btn">عربي</span>
+</div>
+
+<div id="envelope-overlay">
+  <button class="envelope-trigger" id="envelope-btn" aria-label="Ouvrir la lettre / افتح الرسالة">
+    <div class="envelope-body">
+      <div class="envelope-flap"></div>
+      <div class="envelope-seal">N&amp;Z</div>
+    </div>
+  </button>
+  <div class="envelope-hint">
+    <span class="fr">Une lettre t'attend</span>
+    <span class="ar">رسالة بانتظارك</span>
+    <span class="fr" style="font-size:.68rem;opacity:.7;">clique pour l'ouvrir</span>
+    <span class="ar" style="font-size:.82rem;opacity:.7;">انقري لفتحها</span>
+  </div>
+</div>
+
+<div id="stage">
+
+  <section class="hero">
+    <p class="eyebrow"><span class="fr">Une lettre pour toi</span><span class="ar">رسالة إليكِ</span></p>
+    <h1 class="hero-name">Nissou</h1>
+    <p class="hero-sub">
+      <span class="fr">il y a des mots qu'on ne dit jamais assez fort</span>
+      <span class="ar">هناك كلمات لا نقولها بما يكفي من الصدق</span>
+    </p>
+    <div class="scroll-cue"></div>
+  </section>
+
+  <section class="letter">
+    <div class="divider reveal"><span class="mark">✦</span></div>
+    <div class="letter-card reveal">
+      <p>
+        <span class="fr">Nissou,</span>
+        <span class="ar ar-block">نيسو،</span>
+      </p>
+      <p>
+        <span class="fr">Je sais que les mots seuls ne suffisent pas à réparer ce qui s'est brisé entre nous. Mais je voulais te le dire, simplement et sincèrement&nbsp;: tu restes la chose la plus importante dans ma vie.</span>
+        <span class="ar ar-block">أعلم أنّ الكلمات وحدها لا تكفي لترميم ما انكسر بيننا. لكنني أردت أن أقول لكِ، ببساطة وصدق: ما زلتِ أهمّ شيء في حياتي.</span>
+      </p>
+      <p>
+        <span class="fr">Le 6 juillet 2026, je termine enfin ce long chemin d'ingénieur logiciel — un jour que j'attends depuis si longtemps. Mais aucune réussite n'aura vraiment de sens si tu n'es pas là pour la partager avec moi.</span>
+        <span class="ar ar-block">في السادس من يوليو 2026، أُنهي أخيرًا هذا الطريق الطويل لأصبح مهندس برمجيات — يومٌ طال انتظاره. لكن لا فرحة له معنى حقيقي إن لم تكوني بجانبي لأعيشه معي.</span>
+      </p>
+      <p>
+        <span class="fr">J'ai besoin de toi, désespérément, ce jour-là. Pas comme un souvenir du passé, mais comme la personne que je veux voir dans la salle, le jour où tout recommence vraiment.</span>
+        <span class="ar ar-block">أحتاجكِ، بشدّة، في ذلك اليوم. لا كذكرى من الماضي، بل كالشخص الذي أريد أن أراه في القاعة، يوم تبدأ فيه الأشياء من جديد.</span>
+      </p>
+      <p>
+        <span class="fr">Alors voici mon invitation — pas seulement à une cérémonie, mais à revenir, ne serait-ce qu'un instant, dans ma vie. <span class="signoff-inline">Viens.</span></span>
+        <span class="ar ar-block">فهذه دعوتي إليكِ — ليست فقط إلى حفل، بل إلى العودة، ولو للحظة، إلى حياتي. <span class="signoff-inline">يا نور عيني، تعالَي.</span></span>
+      </p>
+    </div>
+    <div class="cta-wrap reveal">
+      <button class="special-btn" id="special-btn">
+        <span class="special-btn-seal" aria-hidden="true">✦</span>
+        <span class="special-btn-text">
+          <span class="fr">Une invitation spéciale t'attend</span>
+          <span class="ar">دعوة خاصة بانتظارك</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <div id="special-section" class="special-section">
+  <section class="invitation">
+    <div class="divider reveal"><span class="mark">✦</span></div>
+    <div class="invite-card reveal">
+      <p class="invite-title">
+        <span class="fr">Cérémonie de Graduation</span>
+        <span class="ar">حفل التخرّج</span>
+      </p>
+      <p class="invite-role">
+        <span class="fr">Ingénieur Logiciel</span>
+        <span class="ar">مهندس برمجيات</span>
+      </p>
+      <p class="invite-date num">06 · 07 · 2026</p>
+      <p class="invite-line">
+        <span class="fr">Ta présence est le seul cadeau qui compte vraiment.</span>
+        <span class="ar">حضورك هو الهدية الوحيدة التي تهمّني حقًا.</span>
+      </p>
+      <div class="countdown" id="countdown">
+        <div class="unit"><span class="figure num" id="cd-days">–</span><span class="caption"><span class="fr">jours</span><span class="ar">يوم</span></span></div>
+        <div class="unit"><span class="figure num" id="cd-hours">–</span><span class="caption"><span class="fr">heures</span><span class="ar">ساعة</span></span></div>
+        <div class="unit"><span class="figure num" id="cd-mins">–</span><span class="caption"><span class="fr">minutes</span><span class="ar">دقيقة</span></span></div>
+      </div>
+      <p class="invite-line" style="margin-top:1.5rem;margin-bottom:0;font-size:.82rem;">
+        <span class="fr">avant le grand jour</span>
+        <span class="ar">تفصلنا عن اليوم المنتظر</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="closing">
+    <div class="heart" aria-hidden="true"></div>
+    <p class="closing-line">
+      <span class="fr">Avec tout mon amour, envers et contre tout.</span>
+      <span class="ar">بكل الحب الذي أملك، رغم كل شيء.</span>
+    </p>
+    <p class="signature">Zakouch Lkechkouch</p>
+    <p class="signature-role">
+      <span class="fr">06.07.2026 · le jour où j'ai besoin de toi</span>
+      <span class="ar">٠٦.٠٧.٢٠٢٦ · اليوم الذي أحتاجكِ فيه</span>
+    </p>
+  </section>
+
+  <footer>
+    <span class="fr">pour Nissou, avec espoir</span>
+    <span class="ar">إلى نيسو، بكل أمل</span>
+  </footer>
+
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- language toggle ---- */
+  var body = document.body;
+  var frBtn = document.getElementById('lang-fr-btn');
+  var arBtn = document.getElementById('lang-ar-btn');
+  function setLang(ar){
+    body.classList.toggle('lang-ar', ar);
+    frBtn.classList.toggle('active', !ar);
+    arBtn.classList.toggle('active', ar);
+    document.documentElement.lang = ar ? 'ar' : 'fr';
+  }
+  frBtn.addEventListener('click', function(){ setLang(false); });
+  arBtn.addEventListener('click', function(){ setLang(true); });
+
+  /* ---- envelope open ---- */
+  var overlay = document.getElementById('envelope-overlay');
+  var envelopeBtn = document.getElementById('envelope-btn');
+  var stage = document.getElementById('stage');
+  function openLetter(){
+    if(overlay.classList.contains('opening')) return;
+    overlay.classList.add('opening');
+    body.classList.remove('locked');
+    setTimeout(function(){
+      overlay.classList.add('opened');
+      stage.classList.add('revealed');
+    }, reduceMotion ? 50 : 750);
+  }
+  envelopeBtn.addEventListener('click', openLetter);
+  body.classList.add('locked');
+
+  /* ---- reveal the special invitation ---- */
+  var specialBtn = document.getElementById('special-btn');
+  var specialSection = document.getElementById('special-section');
+  specialBtn.addEventListener('click', function(){
+    specialBtn.closest('.cta-wrap').style.opacity = '0';
+    specialSection.style.display = 'block';
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        specialSection.classList.add('visible');
+        specialSection.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      });
+    });
+    specialBtn.disabled = true;
+  });
+
+  /* ---- scroll reveal ---- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.2 });
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in-view'); });
+  }
+
+  /* ---- countdown ---- */
+  var target = new Date(2026, 6, 6, 0, 0, 0).getTime();
+  var dEl = document.getElementById('cd-days');
+  var hEl = document.getElementById('cd-hours');
+  var mEl = document.getElementById('cd-mins');
+  function tick(){
+    var diff = target - Date.now();
+    if(diff <= 0){ dEl.textContent = '0'; hEl.textContent = '0'; mEl.textContent = '0'; return; }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    dEl.textContent = d; hEl.textContent = h; mEl.textContent = m;
+  }
+  tick();
+  setInterval(tick, 30000);
+
+  /* ---- ambient particles ---- */
+  var canvas = document.getElementById('particles');
+  if(canvas && !reduceMotion){
+    var ctx = canvas.getContext('2d');
+    var W, H, particles = [];
+    var COLORS = ['rgba(214,143,160,0.5)','rgba(201,161,90,0.45)','rgba(243,233,228,0.3)'];
+    function resize(){
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    function spawn(){
+      return {
+        x: Math.random() * W,
+        y: H + Math.random() * 100,
+        r: 1.5 + Math.random() * 2.5,
+        speed: 0.25 + Math.random() * 0.5,
+        sway: Math.random() * 1.2,
+        phase: Math.random() * Math.PI * 2,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)]
+      };
+    }
+    function init(){
+      resize();
+      particles = [];
+      var count = Math.min(36, Math.floor(W / 40));
+      for(var i = 0; i < count; i++){
+        var p = spawn();
+        p.y = Math.random() * H;
+        particles.push(p);
+      }
+    }
+    function frame(){
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(function(p){
+        p.y -= p.speed;
+        p.phase += 0.01;
+        p.x += Math.sin(p.phase) * p.sway * 0.05;
+        if(p.y < -10){ Object.assign(p, spawn()); }
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(frame);
+    }
+    window.addEventListener('resize', resize);
+    init();
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
