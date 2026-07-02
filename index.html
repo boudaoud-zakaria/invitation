@@ -1,3 +1,5 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Lettre pour Nissou · رسالة إلى نيسو</title>
 <style>
   :root{
@@ -58,22 +60,27 @@
   /* ---------- language toggle ---------- */
   .lang-toggle{
     position:fixed;
-    top:1.25rem;
-    right:1.25rem;
+    top:calc(1.1rem + env(safe-area-inset-top));
+    right:calc(1.1rem + env(safe-area-inset-right));
     z-index:60;
     display:flex;
     align-items:center;
-    gap:.4rem;
-    background:rgba(42,26,46,.7);
+    gap:.3rem;
+    background:rgba(42,26,46,.75);
     border:1px solid var(--gold-soft);
     border-radius:999px;
-    padding:.4rem .5rem;
+    padding:.3rem;
     backdrop-filter:blur(6px);
     font-family:var(--font-label);
     font-size:.72rem;
     letter-spacing:.08em;
   }
-  .lang-toggle span{padding:.25rem .6rem;border-radius:999px;color:rgba(243,233,228,.55);transition:color .3s ease,background .3s ease;}
+  .lang-toggle span{
+    padding:.55rem .7rem;
+    border-radius:999px;color:rgba(243,233,228,.55);
+    transition:color .3s ease,background .3s ease;
+    min-width:2.4rem;text-align:center;
+  }
   .lang-toggle span.active{color:var(--ink);background:var(--gold);}
 
   /* ---------- particle canvas ---------- */
@@ -171,7 +178,7 @@
   .eyebrow .ar{letter-spacing:0;text-transform:none;font-size:.95rem;}
 
   /* ---- hero ---- */
-  .hero{min-height:100svh;justify-content:center;padding-top:0;padding-bottom:0;}
+  .hero{min-height:100vh;min-height:100svh;justify-content:center;padding-top:0;padding-bottom:0;}
   .hero-name{
     font-family:var(--font-script);
     font-size:clamp(3.5rem,14vw,7rem);
@@ -188,7 +195,7 @@
   }
   body.lang-ar .hero-sub{font-style:normal;}
   .scroll-cue{
-    position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+    position:absolute;bottom:calc(2rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
     width:1px;height:46px;
     background:linear-gradient(var(--gold),transparent);
     overflow:hidden;
@@ -355,6 +362,10 @@
   @media (max-width:480px){
     section{padding:5rem 1.25rem;}
     .letter-card{padding:2.25rem 1.5rem;}
+    .invite-card{padding:2.25rem 1.25rem;}
+    .countdown{gap:1.1rem;}
+    .countdown .figure{font-size:1.6rem;}
+    footer{padding-bottom:calc(3rem + env(safe-area-inset-bottom));}
   }
 </style>
 
